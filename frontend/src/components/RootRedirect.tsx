@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext.new';
 export default function RootRedirect() {
   const auth = useAuth();
   const { user } = auth;
-  const loading = auth.status === 'initializing';
+  const loading = auth.isLoading;
 
   // Show loading state while checking auth
   if (loading) {

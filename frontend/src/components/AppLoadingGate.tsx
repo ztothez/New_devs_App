@@ -14,7 +14,7 @@ interface AppLoadingGateProps {
 const AppLoadingGate: React.FC<AppLoadingGateProps> = ({ children }) => {
   const { isLoading: appLoading, modules, permissions, refreshData } = useAppContext();
   const auth = useAuth();
-  const authLoading = auth.status === 'initializing';
+  const authLoading = auth.isLoading;
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [loadingTimeout, setLoadingTimeout] = useState(false);

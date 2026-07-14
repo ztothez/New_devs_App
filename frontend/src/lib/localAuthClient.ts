@@ -105,13 +105,15 @@ class LocalAuthClient {
       this.saveSession(session);
 
       return {
+        data: { user: data.user, session },
         user: data.user,
-        session: session,
+        session,
         error: null,
       };
     } catch (error: any) {
       console.error('[LocalAuth] Sign in failed:', error);
       return {
+        data: { user: null, session: null },
         user: null,
         session: null,
         error: error,

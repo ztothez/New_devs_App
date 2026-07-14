@@ -22,6 +22,7 @@ import RootRedirect from "./components/RootRedirect";
 import Header from "./components/Header";
 import "./index.css";
 import ProfilePage from "./components/profile/ProfilePage";
+import { initializeTheme } from "./lib/themeManager";
 import PropertiesList from "./components/PropertiesList";
 import ReservationsList from "./components/ReservationsList";
 import CleaningAssignments from "./components/CleaningAssignments";
@@ -90,6 +91,7 @@ const persister = createSyncStoragePersister({
 function AppWrapper() {
   // Initialize localStorage manager on app startup
   useEffect(() => {
+    initializeTheme();
     try {
       checkAndClearInvalidTokens();
       const storageInfo = getStorageInfo();
@@ -185,7 +187,7 @@ function AppContent() {
             path="/*"
             element={
               <ProtectedRoute>
-                <div className="flex h-screen overflow-hidden bg-gray-50">
+                <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-gray-900">
                   <Sidebar />
                   <div className="flex flex-col flex-1 overflow-hidden">
                     <Header />

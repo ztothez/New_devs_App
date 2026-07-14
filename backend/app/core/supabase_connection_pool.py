@@ -320,7 +320,13 @@ class SupabaseConnectionPool:
         """Initialize the connection pool"""
         if self._initialized:
             return
-            
+
+        if not settings.supabase_url or not settings.supabase_service_role_key:
+            logger.info(
+                "Supabase credentials not configured - skipping connection pool (Challenge Mode)"
+            )
+            return
+
         try:
             logger.info(f"Initializing Supabase connection pool with {self.max_connections} connections")
             
@@ -354,6 +360,16 @@ class SupabaseConnectionPool:
     @asynccontextmanager
     async def get_client(self):
         """Get a client from the pool with automatic return and graceful degradation"""
+        if not settings.supabase_url or not settings.supabase_service_role_key:
+            yield GracefulDegradationClient(fallback_service)
+            return
+
+        if not self._initialized:
+            await self.initialize()
+            if not self._initialized:
+                yield GracefulDegradationClient(fallback_service)
+                return
+
         if self._circuit_breaker_open:
             if time.time() - self._circuit_breaker_opened_at < self._circuit_breaker_timeout:
                 # Circuit breaker is open - provide graceful degradation

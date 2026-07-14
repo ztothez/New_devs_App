@@ -9,7 +9,7 @@ interface PublicRouteProps {
 export default function PublicRoute({ children }: PublicRouteProps) {
   const auth = useAuth();
   const { user } = auth;
-  const loading = auth.status === 'initializing';
+  const loading = auth.isLoading;
   const location = useLocation();
 
   // Show loading state while checking auth

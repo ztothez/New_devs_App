@@ -2,6 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Dark mode overrides when html.dark is set via profile theme preference */
+@layer base {
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html.dark body {
+    @apply bg-gray-900 text-gray-100;
+  }
+}
+
+@layer components {
+  html.dark .bg-white {
+    @apply bg-gray-800 text-gray-100;
+  }
+
+  html.dark .bg-gray-50 {
+    @apply bg-gray-900;
+  }
+
+  html.dark .text-gray-900 {
+    @apply text-gray-100;
+  }
+
+  html.dark .text-gray-800,
+  html.dark .text-gray-700 {
+    @apply text-gray-200;
+  }
+
+  html.dark .text-gray-600,
+  html.dark .text-gray-500 {
+    @apply text-gray-400;
+  }
+
+  html.dark .border-gray-200,
+  html.dark .border-gray-100,
+  html.dark .border-gray-300 {
+    @apply border-gray-700;
+  }
+
+  html.dark input,
+  html.dark select,
+  html.dark textarea {
+    @apply bg-gray-700 text-gray-100 border-gray-600;
+  }
+}
+
 /* CSS Variables for layout heights */
 :root {
   --header-height: 4rem; /* 64px on mobile */

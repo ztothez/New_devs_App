@@ -90,14 +90,18 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting up...")
 
-    # Initialize Supabase connection pool
+    # Initialize Supabase connection pool (optional in Challenge Mode)
     try:
         from .core.supabase_connection_pool import supabase_pool
+        from .config import settings
 
-        await supabase_pool.initialize()
-        logger.info("✅ Supabase connection pool initialized")
+        if settings.supabase_url and settings.supabase_service_role_key:
+            await supabase_pool.initialize()
+            logger.info("✅ Supabase connection pool initialized")
+        else:
+            logger.info("ℹ️ Supabase not configured - running in Challenge Mode without connection pool")
     except Exception as e:
-        logger.error(f"❌ Supabase connection pool initialization failed: {e}")
+        logger.warning(f"⚠️ Supabase connection pool initialization failed: {e}")
         # Continue startup - fallback to direct connections
 
     # Initialize Redis connection with timeout
@@ -105,7 +109,15 @@ async def lifespan(app: FastAPI):
         await redis_client.initialize()
     except Exception as e:
         logger.warning(f"Redis initialization warning: {e}")
-        # Continue without Redis - will use fallback
+
+    # Initialize database pool once at startup
+    try:
+        from .core.database_pool import db_pool
+
+        await db_pool.initialize()
+        logger.info("✅ Database connection pool initialized")
+    except Exception as e:
+        logger.warning(f"⚠️ Database pool initialization failed: {e}")
 
     # Start cache invalidation listener (only if Redis is connected)
     if redis_client.is_connected:
@@ -126,6 +138,14 @@ async def lifespan(app: FastAPI):
     # Shutdown async processor
     await async_processor.shutdown()
     logger.info("Async processor shutdown completed")
+
+    try:
+        from .core.database_pool import db_pool
+
+        await db_pool.close()
+        logger.info("✅ Database connection pool closed")
+    except Exception as e:
+        logger.warning(f"⚠️ Error closing database pool: {e}")
 
     # Close connection pool
     try:

@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast';
 import { profileService } from '../../services/profileService';
 import { ProfileResponse, ProfileUpdateRequest, PreferencesUpdateRequest } from '../../types/profile';
 import AvatarUpload from './AvatarUpload';
+import { applyTheme, AppTheme } from '../../lib/themeManager';
 
 const ProfilePage: React.FC = () => {
   const [profileData, setProfileData] = useState<ProfileResponse | null>(null);
@@ -70,6 +71,8 @@ const ProfilePage: React.FC = () => {
         compact_view: data.preferences.compact_view,
         sidebar_collapsed: data.preferences.sidebar_collapsed
       });
+
+      applyTheme((data.profile.theme === 'dark' ? 'dark' : 'light') as AppTheme);
       
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -102,6 +105,9 @@ const ProfilePage: React.FC = () => {
 
       const updatedProfile = await profileService.updateProfile(changes);
       setProfileData(prev => prev ? { ...prev, profile: updatedProfile } : null);
+      if (changes.theme) {
+        applyTheme(changes.theme === 'dark' ? 'dark' : 'light');
+      }
       toast.success('Profile updated successfully!');
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -504,7 +510,11 @@ const ProfilePage: React.FC = () => {
                         <Monitor className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <select
                           value={profileForm.theme || 'light'}
-                          onChange={(e) => setProfileForm(prev => ({ ...prev, theme: e.target.value }))}
+                          onChange={(e) => {
+                            const theme = e.target.value as AppTheme;
+                            setProfileForm(prev => ({ ...prev, theme }));
+                            applyTheme(theme);
+                          }}
                           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
                         >
                           <option value="light">Light</option>
